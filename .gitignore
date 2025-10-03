@@ -1,0 +1,97 @@
+# Build outputs
+bin/
+*.exe
+*.o
+*.obj
+*.a
+*.lib
+*.dll
+*.so
+*.dylib
+
+# Object files
+*.o
+*.ko
+*.obj
+*.gcno
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Libraries
+*.lib
+*.a
+*.la
+*.lo
+*.dylib
+*.so
+*.so.*
+*.dll
+
+# Debug files
+*.dSYM/
+*.su
+*.idb
+*.pdb
+*.ilk
+*.db
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Dependency directories
+deps/
+build/
+dist/
+
+# Autotools
+autom4te.cache
+*.in
+aclocal.m4
+compile
+config.guess
+config.h
+config.h.in
+config.log
+config.status
+config.sub
+configure
+depcomp
+install-sh
+ltmain.sh
+missing
+*.m4
+
+# Compiled Source
+*.com
+*.class
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+
+# Project specific (NES emulator)
+*.nes
+*.fds
+*.nsf
+*.unif
+*.unif
+saves/
+states/
