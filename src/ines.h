@@ -30,17 +30,15 @@ typedef struct {
  *
  * This function allocates memory for PRG and CHR data,
  * validates the iNES header, and extracts mapper/mirroring info.
+ * Terminates program if error is encountered
  *
  * @param[in]  path
  *     Path to the .nes ROM file to load.
  * @param[out] out
  *     Pointer to an INES struct to populate with cartridge data.
  *
- * @return
- *     EXIT_SUCCESS if the file was loaded successfully,
- *     or EXIT_FAILURE if the file was invalid or could not be opened.
  */
-int ines_load(const char *path, INES *out);
+void ines_load(const char *path, INES *out);
 
 /**
  * Frees memory associated with an INES structure.

@@ -1,0 +1,324 @@
+/**
+ * @file itable.h
+ * 
+ * @brief Defines 6502 CPU Instruction table
+ * 
+ * @author E Warren (ethanwarren768@gmail.com)
+ * 
+ * @date 2025-10-05
+ */
+#ifndef ITABLE_H
+#define ITABLE_H
+#include "opcodes.h"
+#include "cpu.h"
+
+typedef int (*InstructionHandler)(CPU *c);
+/***************************OPCODE_TEMPLATES**********************************/
+
+int handle_LDA_IMM(CPU *c);
+int handle_LDA_ZP(CPU *c);
+int handle_LDA_ZPX(CPU *c);
+int handle_LDA_ABS(CPU *c);
+int handle_LDA_ABSX(CPU *c);
+int handle_LDA_ABSY(CPU *c);
+int handle_LDA_INDX(CPU *c);
+int handle_LDA_INDY(CPU *c);
+int handle_LDX_IMM(CPU *c);
+int handle_LDX_ZP(CPU *c);
+int handle_LDX_ZPY(CPU *c);
+int handle_LDX_ABS(CPU *c);
+int handle_LDX_ABSY(CPU *c);
+int handle_LDY_IMM(CPU *c);
+int handle_LDY_ZP(CPU *c);
+int handle_LDY_ZPX(CPU *c);
+int handle_LDY_ABS(CPU *c);
+int handle_LDY_ABSX(CPU *c);
+int handle_STA_ZP(CPU *c);
+int handle_STA_ZPX(CPU *c);
+int handle_STA_ABS(CPU *c);
+int handle_STA_ABSX(CPU *c);
+int handle_STA_ABSY(CPU *c);
+int handle_STA_INDX(CPU *c);
+int handle_STA_INDY(CPU *c);
+int handle_STX_ZP(CPU *c);
+int handle_STX_ZPY(CPU *c);
+int handle_STX_ABS(CPU *c);
+int handle_STY_ZP(CPU *c);
+int handle_STY_ZPX(CPU *c);
+int handle_STY_ABS(CPU *c);
+int handle_TAX(CPU *c);
+int handle_TAY(CPU *c);
+int handle_TXA(CPU *c);
+int handle_TYA(CPU *c);
+int handle_TSX(CPU *c);
+int handle_TXS(CPU *c);
+int handle_PHA(CPU *c);
+int handle_PHP(CPU *c);
+int handle_PLA(CPU *c);
+int handle_PLP(CPU *c);
+int handle_AND_IMM(CPU *c);
+int handle_AND_ZP(CPU *c);
+int handle_AND_ZPX(CPU *c);
+int handle_AND_ABS(CPU *c);
+int handle_AND_ABSX(CPU *c);
+int handle_AND_ABSY(CPU *c);
+int handle_AND_INDX(CPU *c);
+int handle_AND_INDY(CPU *c);
+int	handle_ORA_IMM(CPU *c);
+int	handle_ORA_ZP(CPU *c);
+int	handle_ORA_ZPX(CPU *c);
+int	handle_ORA_ABS(CPU *c);
+int	handle_ORA_ABSX(CPU *c);
+int	handle_ORA_ABSY(CPU *c);
+int	handle_ORA_INDX(CPU *c);
+int	handle_ORA_INDY(CPU *c);
+int	handle_EOR_IMM(CPU *c);
+int	handle_EOR_ZP(CPU *c);
+int	handle_EOR_ZPX(CPU *c);
+int	handle_EOR_ABS(CPU *c);
+int	handle_EOR_ABSX(CPU *c);
+int	handle_EOR_ABSY(CPU *c);
+int	handle_EOR_INDX(CPU *c);
+int	handle_EOR_INDY(CPU *c);
+int	handle_BIT_ZP(CPU *c);
+int	handle_BIT_ABS(CPU *c);
+int	handle_ADC_IMM(CPU *c);
+int	handle_ADC_ZP(CPU *c);
+int	handle_ADC_ZPX(CPU *c);
+int	handle_ADC_ABS(CPU *c);
+int	handle_ADC_ABSX(CPU *c);
+int	handle_ADC_ABSY(CPU *c);
+int	handle_ADC_INDX(CPU *c);
+int	handle_ADC_INDY(CPU *c);
+int	handle_SBC_IMM(CPU *c);
+int	handle_SBC_ZP(CPU *c);
+int	handle_SBC_ZPX(CPU *c);
+int	handle_SBC_ABS(CPU *c);
+int	handle_SBC_ABSX(CPU *c);
+int	handle_SBC_ABSY(CPU *c);
+int	handle_SBC_INDX(CPU *c);
+int	handle_SBC_INDY(CPU *c);
+int handle_CMP_IMM(CPU *c);
+int handle_CMP_ZP(CPU *c);
+int handle_CMP_ZPX(CPU *c);
+int handle_CMP_ABS(CPU *c);
+int handle_CMP_ABSX(CPU *c);
+int handle_CMP_ABSY(CPU *c);
+int handle_CMP_INDX(CPU *c);
+int handle_CMP_INDY(CPU *c);
+int handle_CPX_IMM(CPU *c);
+int handle_CPX_ZP(CPU *c);
+int handle_CPX_ABS(CPU *c);
+int handle_CPY_IMM(CPU *c);
+int handle_CPY_ZP(CPU *c);
+int handle_CPY_ABS(CPU *c);
+int handle_INC_ZP(CPU *c);
+int handle_INC_ZPX(CPU *c);
+int handle_INC_ABS(CPU *c);
+int handle_INC_ABSX(CPU *c);
+int handle_INX(CPU *c);
+int handle_INY(CPU *c);
+int handle_DEC_ZP(CPU *c);
+int handle_DEC_ZPX(CPU *c);
+int handle_DEC_ABS(CPU *c);
+int handle_DEC_ABSX(CPU *c);
+int handle_DEX(CPU *c);
+int handle_DEY(CPU *c);
+int handle_ASL_ACC(CPU *c);
+int handle_ASL_ZP(CPU *c);
+int handle_ASL_ZPX(CPU *c);
+int handle_ASL_ABS(CPU *c);
+int handle_ASL_ABSX(CPU *c);
+int handle_LSR_ACC(CPU *c);
+int handle_LSR_ZP(CPU *c);
+int handle_LSR_ZPX(CPU *c);
+int handle_LSR_ABS(CPU *c);
+int handle_LSR_ABSX(CPU *c);
+int handle_ROL_ACC(CPU *c);
+int handle_ROL_ZP(CPU *c);
+int handle_ROL_ZPX(CPU *c);
+int handle_ROL_ABS(CPU *c);
+int handle_ROL_ABSX(CPU *c);
+int handle_ROR_ACC(CPU *c);
+int handle_ROR_ZP(CPU *c);
+int handle_ROR_ZPX(CPU *c);
+int handle_ROR_ABS(CPU *c);
+int handle_ROR_ABSX(CPU *c);
+int handle_JMP_ABS(CPU *c);
+int handle_JMP_IND(CPU *c);
+int handle_JSR_ABS(CPU *c);
+int handle_RTS(CPU *c);
+int handle_BCC(CPU *c);
+int handle_BCS(CPU *c);
+int handle_BEQ(CPU *c);
+int handle_BMI(CPU *c);
+int handle_BNE(CPU *c);
+int handle_BPL(CPU *c);
+int handle_BVC(CPU *c);
+int handle_BVS(CPU *c);
+int handle_CLC(CPU *c);
+int handle_CLD(CPU *c);
+int handle_CLI(CPU *c);
+int handle_CLV(CPU *c);
+int handle_SEC(CPU *c);
+int handle_SED(CPU *c);
+int handle_SEI(CPU *c);
+int handle_BRK(CPU *c);
+int handle_NOP(CPU *c); 
+int handle_RTI(CPU *c);
+
+static InstructionHandler i_table[256] = {
+    [OC_LDA_IMM] = handle_LDA_IMM,
+    [OC_LDA_ZP] = handle_LDA_ZP,
+    [OC_LDA_ZPX] = handle_LDA_ZPX,
+    [OC_LDA_ABS] = handle_LDA_ABS,
+    [OC_LDA_ABSX] = handle_LDA_ABSX,
+    [OC_LDA_ABSY] = handle_LDA_ABSY,
+    [OC_LDA_INDX] = handle_LDA_INDX,
+    [OC_LDA_INDY] = handle_LDA_INDY,
+    [OC_LDX_IMM] = handle_LDX_IMM,
+    [OC_LDX_ZP] = handle_LDX_ZP,
+    [OC_LDX_ZPY] = handle_LDX_ZPY,
+    [OC_LDX_ABS] = handle_LDX_ABS,
+    [OC_LDX_ABSY] = handle_LDX_ABSY,
+    [OC_LDY_IMM] = handle_LDY_IMM,
+    [OC_LDY_ZP] = handle_LDY_ZP,
+    [OC_LDY_ZPX] = handle_LDY_ZPX,
+    [OC_LDY_ABS] = handle_LDY_ABS,
+    [OC_LDY_ABSX] = handle_LDY_ABSX,
+    [OC_STA_ZP] = handle_STA_ZP,
+    [OC_STA_ZPX] = handle_STA_ZPX,
+    [OC_STA_ABS] = handle_STA_ABS,
+    [OC_STA_ABSX] = handle_STA_ABSX,
+    [OC_STA_ABSY] = handle_STA_ABSY,
+    [OC_STA_INDX] = handle_STA_INDX,
+    [OC_STA_INDY] = handle_STA_INDY,
+    [OC_STX_ZP] = handle_STX_ZP,
+    [OC_STX_ZPY] = handle_STX_ZPY,
+    [OC_STX_ABS] = handle_STX_ABS,
+    [OC_STY_ZP] = handle_STY_ZP,
+    [OC_STY_ZPX] = handle_STY_ZPX,
+    [OC_STY_ABS] = handle_STY_ABS,
+    [OC_TAX] = handle_TAX,
+    [OC_TAY] = handle_TAY,
+    [OC_TXA] = handle_TXA,
+    [OC_TYA] = handle_TYA,
+    [OC_TSX] = handle_TSX,
+    [OC_TXS] = handle_TXS,
+    [OC_PHA] = handle_PHA,
+    [OC_PHP] = handle_PHP,
+    [OC_PLA] = handle_PLA,
+    [OC_PLP] = handle_PLP,
+    [OC_AND_IMM] = handle_AND_IMM,
+    [OC_AND_ZP] = handle_AND_ZP,
+    [OC_AND_ZPX] = handle_AND_ZPX,
+    [OC_AND_ABS] = handle_AND_ABS,
+    [OC_AND_ABSX] = handle_AND_ABSX,
+    [OC_AND_ABSY] = handle_AND_ABSY,
+    [OC_AND_INDX] = handle_AND_INDX,
+    [OC_AND_INDY] = handle_AND_INDY,
+    [OC_ORA_IMM] = handle_ORA_IMM,
+    [OC_ORA_ZP] = handle_ORA_ZP,
+    [OC_ORA_ZPX] = handle_ORA_ZPX,
+    [OC_ORA_ABS] = handle_ORA_ABS,
+    [OC_ORA_ABSX] = handle_ORA_ABSX,
+    [OC_ORA_ABSY] = handle_ORA_ABSY,
+    [OC_ORA_INDX] = handle_ORA_INDX,
+    [OC_ORA_INDY] = handle_ORA_INDY,	
+    [OC_EOR_IMM] = handle_EOR_IMM,
+    [OC_EOR_ZP] = handle_EOR_ZP,
+    [OC_EOR_ZPX] = handle_EOR_ZPX,
+    [OC_EOR_ABS] = handle_EOR_ABS,
+    [OC_EOR_ABSX] = handle_EOR_ABSX,
+    [OC_EOR_ABSY] = handle_EOR_ABSY,
+    [OC_EOR_INDX] = handle_EOR_INDX,
+    [OC_EOR_INDY] = handle_EOR_INDY,
+    [OC_BIT_ZP] = handle_BIT_ZP,
+    [OC_BIT_ABS] = handle_BIT_ABS,
+    [OC_ADC_IMM] = handle_ADC_IMM,
+    [OC_ADC_ZP] = handle_ADC_ZP,
+    [OC_ADC_ZPX] = handle_ADC_ZPX,
+    [OC_ADC_ABS] = handle_ADC_ABS,
+    [OC_ADC_ABSX] = handle_ADC_ABSX,
+    [OC_ADC_ABSY] = handle_ADC_ABSY,
+    [OC_ADC_INDX] = handle_ADC_INDX,
+    [OC_ADC_INDY] = handle_ADC_INDY,
+    [OC_SBC_IMM] = handle_SBC_IMM,
+    [OC_SBC_ZP] = handle_SBC_ZP,
+    [OC_SBC_ZPX] = handle_SBC_ZPX,
+    [OC_SBC_ABS] = handle_SBC_ABS,
+    [OC_SBC_ABSX] = handle_SBC_ABSX,
+    [OC_SBC_ABSY] = handle_SBC_ABSY,
+    [OC_SBC_INDX] = handle_SBC_INDX,
+    [OC_SBC_INDY] = handle_SBC_INDY,
+    [OC_CMP_IMM] = handle_CMP_IMM,
+    [OC_CMP_ZP] = handle_CMP_ZP,
+    [OC_CMP_ZPX] = handle_CMP_ZPX,
+    [OC_CMP_ABS] = handle_CMP_ABS,
+    [OC_CMP_ABSX] = handle_CMP_ABSX,
+    [OC_CMP_ABSY] = handle_CMP_ABSY,
+    [OC_CMP_INDX] = handle_CMP_INDX,
+    [OC_CMP_INDY] = handle_CMP_INDY,
+    [OC_CPX_IMM] = handle_CPX_IMM,
+    [OC_CPX_ZP] = handle_CPX_ZP,
+    [OC_CPX_ABS] = handle_CPX_ABS,
+    [OC_CPY_IMM] = handle_CPY_IMM,
+    [OC_CPY_ZP] = handle_CPY_ZP,
+    [OC_CPY_ABS] = handle_CPY_ABS,
+    [OC_INC_ZP] = handle_INC_ZP,
+    [OC_INC_ZPX] = handle_INC_ZPX,
+    [OC_INC_ABS] = handle_INC_ABS,
+    [OC_INC_ABSX] = handle_INC_ABSX,
+    [OC_INX] = handle_INX,
+    [OC_INY] = handle_INY,
+    [OC_DEC_ZP] = handle_DEC_ZP,
+    [OC_DEC_ZPX] = handle_DEC_ZPX,
+    [OC_DEC_ABS] = handle_DEC_ABS,
+    [OC_DEC_ABSX] = handle_DEC_ABSX,
+    [OC_DEX] = handle_DEX,
+    [OC_DEY] = handle_DEY,
+    [OC_ASL_ACC] = handle_ASL_ACC,
+    [OC_ASL_ZP] = handle_ASL_ZP,
+    [OC_ASL_ZPX] = handle_ASL_ZPX,
+    [OC_ASL_ABS] = handle_ASL_ABS,
+    [OC_ASL_ABSX] = handle_ASL_ABSX,
+    [OC_LSR_ACC] = handle_LSR_ACC,
+    [OC_LSR_ZP] = handle_LSR_ZP,
+    [OC_LSR_ZPX] = handle_LSR_ZPX,
+    [OC_LSR_ABS] = handle_LSR_ABS,
+    [OC_LSR_ABSX] = handle_LSR_ABSX,
+    [OC_ROL_ACC] = handle_ROL_ACC,
+    [OC_ROL_ZP] = handle_ROL_ZP,
+    [OC_ROL_ZPX] = handle_ROL_ZPX,
+    [OC_ROL_ABS] = handle_ROL_ABS,
+    [OC_ROL_ABSX] = handle_ROL_ABSX,
+    [OC_ROR_ACC] = handle_ROR_ACC,
+    [OC_ROR_ZP] = handle_ROR_ZP,
+    [OC_ROR_ZPX] = handle_ROR_ZPX,
+    [OC_ROR_ABS] = handle_ROR_ABS,
+    [OC_ROR_ABSX] = handle_ROR_ABSX,
+    [OC_JMP_ABS] = handle_JMP_ABS,
+    [OC_JMP_IND] = handle_JMP_IND,
+    [OC_JSR_ABS] = handle_JSR_ABS,
+    [OC_RTS] = handle_RTS,
+    [OC_BCC] = handle_BCC,
+    [OC_BCS] = handle_BCS,
+    [OC_BEQ] = handle_BEQ,
+    [OC_BMI] = handle_BMI,
+    [OC_BNE] = handle_BNE,
+    [OC_BPL] = handle_BPL,
+    [OC_BVC] = handle_BVC,
+    [OC_BVS] = handle_BVS,
+    [OC_CLC] = handle_CLC,
+    [OC_CLD] = handle_CLD,
+    [OC_CLI] = handle_CLI,
+    [OC_CLV] = handle_CLV,
+    [OC_SEC] = handle_SEC,
+    [OC_SED] = handle_SED,
+    [OC_SEI] = handle_SEI,
+    [OC_BRK] = handle_BRK,
+    [OC_NOP] = handle_NOP,
+    [OC_RTI] = handle_RTI,
+};
+
+#endif //ITABLE_H

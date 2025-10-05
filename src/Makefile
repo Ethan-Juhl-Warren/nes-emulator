@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = -std=c11 -O2 -Wall `sdl2-config --cflags`
 LDLIBS = `sdl2-config --libs`
-SRCS = main.c cpu.c ines.c ppu.c
+SRCS = main.c cpu.c ines.c ppu.c apu.c cntrler.c logging.c screen.c
 OBJS = $(addprefix ../bin/,$(SRCS:.c=.o))
 BINDIR = ../bin
 

@@ -10,25 +10,27 @@
  */
 
 #include "ines.h"
+#include "logging.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-int ines_load(const char *path, INES *out)
+void ines_load(const char *path, INES *out)
 {
 	FILE *f = fopen(path, "rb");
-	if (!f)
-		return -1;
+	if (!f) {
+		abort_e("Failed to load ROM: ROM file: %s was not found", path);
+	}
 
 	uint8_t header[16];
 	if (fread(header, 1, 16, f) != 16) {
 		fclose(f);
-		return -1;
+		abort_e("Failed to load ROM: %s is not a valid ines ROM", path);
 	}
 
 	if (memcmp(header, "NES\x1A", 4) != 0) {
 		fclose(f);
-		return -1;
+		abort_e("Failed to load ROM: %s is not a valid ines ROM", path);
 	}
 
 	size_t prg_pages = header[4];
@@ -44,27 +46,29 @@ int ines_load(const char *path, INES *out)
 	out->prg_rom = malloc(out->prg_size);
 	if (!out->prg_rom) {
 		fclose(f);
-		return -1;
+		abort_e("Failed to load ROM: Critical memory error encountered", "");
 	}
 
-	if (out->chr_size)
+	if (out->chr_size) {
 		out->chr_rom = malloc(out->chr_size);
-	else
+	} else {
 		out->chr_rom = NULL;
+	}
 
 	// TODO: Implement support for trainer data if present
-	if (flags6 & 0x04)
+	if (flags6 & 0x04) {
 		fseek(f, 512, SEEK_CUR);
+	}
 
 	if (fread(out->prg_rom, 1, out->prg_size, f) != out->prg_size) {
 		fclose(f);
-		return -1;
+		abort_e("Failed to load ROM: %s is invalid", path);
 	}
 
 	if (out->chr_size) {
 		if (fread(out->chr_rom, 1, out->chr_size, f) != out->chr_size) {
 			fclose(f);
-			return -1;
+			abort_e("Failed to load ROM: %s is invalid", path);
 		}
 	}
 
@@ -72,7 +76,6 @@ int ines_load(const char *path, INES *out)
 
 	// TODO: Validate ROM integrity and iNES format variations
 	// TODO: Support iNES 2.0 format
-	return 0;
 }
 
 /**
