@@ -9,6 +9,8 @@ bin/
 *.so
 *.dylib
 
+logs/
+*.txt
 # Object files
 *.o
 *.ko
