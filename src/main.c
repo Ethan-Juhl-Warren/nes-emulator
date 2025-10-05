@@ -8,7 +8,6 @@
  * @author E Warren (ethanwarren768@gmail.com)
  * @date   2025-07-29
  */
-
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_timer.h>
 #include <stdint.h>
@@ -29,7 +28,6 @@ CPU *global_cpu = NULL;
 
 int main(int argc, char **argv)
 {
-	// Initilize Logging
 	init_log();
 
 #ifdef DEBUG_MODE
@@ -42,7 +40,7 @@ int main(int argc, char **argv)
 		print_error("No ROM specified. Usage: %s <path-to-ines-rom>", argv[0]);
 		return 1;
 	}
-	// Load cartridge ROM
+
 	INES cart = { 0 };
 	ines_load(argv[1], &cart);
 
@@ -54,31 +52,35 @@ int main(int argc, char **argv)
 	Controller c1 = { 0 };
 	Controller c2 = { 0 };
 
-	// Initialize CPU
 	CPU cpu = { 0 };
 	cpu.cart = &cart;
 	set_controllers(&c1, &c2);
 	cpu_reset(&cpu);
 	global_cpu = &cpu;
-	// Initialize PPU
+
 	PPU ppu;
 	ppu_init(&ppu, &cart);
 	global_ppu = &ppu;
 
-	// Initilize the screen
 	Screen screen = { 0 };
 	if (screen_init(&screen, argv[1], SCREEN_WIDTH, SCREEN_HEIGHT)) {
 		ines_free(&cart);
 		return 1;
 	}
-	// Main emulation loop
+
+	int frame_count = 0;
+	int nmi_count = 0;
+	uint8_t last_ppumask = 0xFF;
+	uint8_t last_ppuctrl = 0xFF;
+
 	bool running = true;
 	SDL_Event ev;
-	const int cpu_cycles_per_frame = 29780;
+
+	printf("Starting emulation...\n");
+
 	while (running) {
 		uint32_t frame_start = SDL_GetTicks();
 
-		// Process SDL events (window close, input)
 		while (SDL_PollEvent(&ev)) {
 			if (ev.type == SDL_QUIT)
 				running = false;
@@ -89,15 +91,13 @@ int main(int argc, char **argv)
 		controller_set_state(&c1, get_controller_state_from_device());
 		controller_set_state(&c2, get_controller_state_from_device());
 
-		//Update controllers
-
+		ppu.frame_done = false;
 		while (!ppu.frame_done) {
-			// Execute one CPU step
 			int cyc = cpu_step(&cpu);
 			if (cpu.PC == 0x0000) {
 				abort_e("Crashed to zero page");
 			}
-			// Run the PPU: 3 PPU cycles per CPU cycle (NTSC)
+
 			for (int i = 0; i < cyc * 3; ++i) {
 				ppu_clock(&ppu);
 			}
@@ -105,26 +105,63 @@ int main(int argc, char **argv)
 			if (ppu.nmi_occurred && (ppu.ppuctrl & 0x80)) {
 				cpu_interrupt(&cpu, (1 << 0));
 				ppu.nmi_occurred = false;
+				nmi_count++;
+			}
+			if (ppu.frame_done) {
+				screen_render(&screen, ppu.framebuffer);
+				ppu.frame_done = false;
+				break;			// Exit to process SDL events
 			}
 		}
-		// TODO: Implement frame timing so emulator runs at ~60.098Hz (NTSC)
-		// TODO: Support multiple mappers beyond NROM
-		// TODO: Implement SDL audio output for APU
-		// TODO: Add save/load state support
-		// TODO: Add debug logging
 
-		// Render framebuffer when a frame is ready
-		screen_render(&screen, ppu.framebuffer);
-		ppu.frame_done = false;
+		// Report PPUMASK/PPUCTRL changes IMMEDIATELY
+		if (ppu.ppumask != last_ppumask || ppu.ppuctrl != last_ppuctrl) {
+			printf
+				("Frame %d: PPUCTRL %02X->%02X, PPUMASK %02X->%02X (BG:%s SPR:%s)\n",
+				 frame_count, last_ppuctrl, ppu.ppuctrl, last_ppumask,
+				 ppu.ppumask, (ppu.ppumask & 0x08) ? "ON" : "OFF",
+				 (ppu.ppumask & 0x10) ? "ON" : "OFF");
+			last_ppumask = ppu.ppumask;
+			last_ppuctrl = ppu.ppuctrl;
+		}
+		// Report sprite status every 60 frames
+		if (frame_count % 60 == 0) {
+			int visible_sprites = 0;
+			for (int i = 0; i < 64; i++) {
+				uint8_t y = ppu.oam[i * 4];
+				if (y > 0 && y < 0xEF)
+					visible_sprites++;
+			}
+
+			printf
+				("Frame %d: PC=%04X NMIs=%d Visible sprites=%d PPUMASK=%02X\n",
+				 frame_count, cpu.PC, nmi_count, visible_sprites, ppu.ppumask);
+
+			// Show first visible sprite
+			for (int i = 0; i < 64; i++) {
+				uint8_t y = ppu.oam[i * 4];
+				if (y > 0 && y < 0xEF) {
+					printf
+						("  First visible sprite: Y=%d Tile=%02X Attr=%02X X=%d\n",
+						 y, ppu.oam[i * 4 + 1], ppu.oam[i * 4 + 2],
+						 ppu.oam[i * 4 + 3]);
+					break;
+				}
+			}
+		}
+
+		frame_count++;
 
 		int frame_time = SDL_GetTicks() - frame_start;
-		const int frame_delay = 1000 / 60;	// ~16.67 ms
+		const int frame_delay = 1000 / 60;
 		if (frame_delay > frame_time) {
 			SDL_Delay(frame_delay - frame_time);
 		}
 	}
+
+	printf("Exited at PC=%04X after %d frames\n", cpu.PC, frame_count);
 	cpu_coredump(&cpu);
-	// Cleanup
+
 	screen_destroy(&screen);
 	ines_free(&cart);
 	return 0;

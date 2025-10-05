@@ -27,7 +27,6 @@ uint8_t controller_read(Controller *cntrl)
 	// Return bit 0 of shift register, then shift right
 	uint8_t result = cntrl->shift_reg & 1;
 	cntrl->shift_reg >>= 1;
-	cntrl->shift_reg |= 0x40;	// Set bit 6 (open bus behavior)
 
 	return result;
 }

@@ -100,7 +100,12 @@ void ppu_clock(PPU *p)
 		// Trigger NMI if enabled
 		if (p->ppuctrl & 0x80) {
 			p->nmi_occurred = true;
-			ppu_trigger_nmi(p);
+		}
+		static int vb_count = 0;
+		if (vb_count < 5) {
+			printf("VBlank SET: PPUSTATUS now = %02X, PPUCTRL = %02X\n",
+				   p->ppustatus, p->ppuctrl);
+			vb_count++;
 		}
 	}
 	// Increment cycle counter
@@ -430,10 +435,22 @@ uint8_t ppu_reg_read(PPU *p, uint16_t addr)
 	case 2:
 		result = p->ppustatus;
 		p->write_toggle = false;
-		uint8_t status = p->ppustatus;
-		p->ppustatus &= ~0x80;
-		p->nmi_occurred = false;
-		return status;
+		static int debug_reads = 0;
+		if (debug_reads < 20) {
+			printf
+				("READ PPUSTATUS: scanline=%d result=%02X (VBlank=%d) - will%s clear\n",
+				 p->scanline, result, (result & 0x80) ? 1 : 0,
+				 (p->scanline < 241 || p->scanline > 260) ? "" : " NOT");
+			debug_reads++;
+		}
+		// ONLY clear VBlank if we're NOT in VBlank period
+		// VBlank should only be cleared at pre-render scanline
+		if (p->scanline < 241 || p->scanline > 260) {
+			p->ppustatus &= ~0x80;
+			p->nmi_occurred = false;
+		}
+
+		return result;
 	case 3:
 		return 0;
 	case 4:

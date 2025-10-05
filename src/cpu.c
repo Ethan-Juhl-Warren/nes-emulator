@@ -190,6 +190,15 @@ void cpu_write(CPU *c, uint16_t addr, uint8_t val)
 		return;
 	}
 
+	if (addr == 0x4014) {		// OAMDMA - Sprite DMA transfer
+		uint16_t src_addr = val * 0x100;
+		for (int i = 0; i < 256; i++) {
+			global_ppu->oam[i] = cpu_read(c, src_addr + i);
+		}
+		c->cycles += 513;		// DMA takes 513/514 cycles
+		return;
+	}
+
 	if (addr < 0x0800) {
 		c->ram[addr & 0x07FF] = val;
 		return;
