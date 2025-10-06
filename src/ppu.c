@@ -56,7 +56,6 @@ void ppu_init(PPU *p, INES *cart)
 	p->ppustatus = 0xA0;
 	p->write_toggle = false;
 }
-
 void ppu_clock(PPU *p)
 {
 	// Pre-render scanline (261)
@@ -64,6 +63,10 @@ void ppu_clock(PPU *p)
 		if (p->cycle == 1) {
 			// Clear VBlank, sprite 0 hit, and sprite overflow flags
 			p->ppustatus &= 0x1F;
+			p->nmi_occurred = false;
+
+			// CRITICAL: Frame is done AFTER VBlank completes
+			p->frame_done = true;
 		} else if (p->cycle == 304) {
 			// Copy temporary address to current address (vertical scroll)
 			if (p->ppumask & 0x18) {
@@ -101,12 +104,6 @@ void ppu_clock(PPU *p)
 		if (p->ppuctrl & 0x80) {
 			p->nmi_occurred = true;
 		}
-		static int vb_count = 0;
-		if (vb_count < 5) {
-			printf("VBlank SET: PPUSTATUS now = %02X, PPUCTRL = %02X\n",
-				   p->ppustatus, p->ppuctrl);
-			vb_count++;
-		}
 	}
 	// Increment cycle counter
 	p->cycle++;
@@ -117,10 +114,10 @@ void ppu_clock(PPU *p)
 		p->cycle = 0;
 		p->scanline++;
 
-		// Handle end of frame
+		// Handle end of frame - wrap back to scanline 0
+		// DON'T set frame_done here - it's set at scanline 261 cycle 1
 		if (p->scanline >= 262) {
 			p->scanline = 0;
-			p->frame_done = true;
 		}
 	}
 }

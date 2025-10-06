@@ -97,7 +97,6 @@ int main(int argc, char **argv)
 			if (cpu.PC == 0x0000) {
 				abort_e("Crashed to zero page");
 			}
-
 			for (int i = 0; i < cyc * 3; ++i) {
 				ppu_clock(&ppu);
 			}
