@@ -1132,18 +1132,20 @@ int handle_SBC_INDY(CPU *c)
 int handle_CMP_IMM(CPU *c)
 {
 	uint8_t v = fetch_byte(c);
+	uint8_t r = c->A - v;
 	set_flag(c, FLAG_C, c->A >= v);
 	set_flag(c, FLAG_Z, c->A == v);
-	set_flag(c, FLAG_N, c->A & 0x80);
+	set_flag(c, FLAG_N, r & 0x80);
 	return 2;
 }
 int handle_CMP_ZP(CPU *c)
 {
 	uint8_t addr = fetch_byte(c);
 	uint8_t v = cpu_read(c, addr);
+	uint8_t r = c->A - v;
 	set_flag(c, FLAG_C, c->A >= v);
 	set_flag(c, FLAG_Z, c->A == v);
-	set_flag(c, FLAG_N, c->A & 0x80);
+	set_flag(c, FLAG_N, r & 0x80);
 	return 3;
 }
 int handle_CMP_ZPX(CPU *c)
@@ -1151,18 +1153,20 @@ int handle_CMP_ZPX(CPU *c)
 	uint8_t base_addr = fetch_byte(c);
 	uint8_t addr = (base_addr + c->X) & 0xff;
 	uint8_t v = cpu_read(c, addr);
+	uint8_t r = c->A - v;
 	set_flag(c, FLAG_C, c->A >= v);
 	set_flag(c, FLAG_Z, c->A == v);
-	set_flag(c, FLAG_N, c->A & 0x80);
+	set_flag(c, FLAG_N, r & 0x80);
 	return 4;
 }
 int handle_CMP_ABS(CPU *c)
 {
 	uint16_t addr = fetch_word(c);
 	uint8_t v = cpu_read(c, addr);
+	uint8_t r = c->A - v;
 	set_flag(c, FLAG_C, c->A >= v);
 	set_flag(c, FLAG_Z, c->A == v);
-	set_flag(c, FLAG_N, c->A & 0x80);
+	set_flag(c, FLAG_N, r & 0x80);
 	return 4;
 }
 int handle_CMP_ABSX(CPU *c)
@@ -1172,9 +1176,10 @@ int handle_CMP_ABSX(CPU *c)
 	int page_crossed = (base_addr & 0xFF00) != (addr & 0xFF00);
 
 	uint8_t v = cpu_read(c, addr);
+	uint8_t r = c->A - v;
 	set_flag(c, FLAG_C, c->A >= v);
 	set_flag(c, FLAG_Z, c->A == v);
-	set_flag(c, FLAG_N, c->A & 0x80);
+	set_flag(c, FLAG_N, r & 0x80);
 	return 4 + page_crossed;
 }
 int handle_CMP_ABSY(CPU *c)
@@ -1184,9 +1189,10 @@ int handle_CMP_ABSY(CPU *c)
 	int page_crossed = (base_addr & 0xFF00) != (addr & 0xFF00);
 
 	uint8_t v = cpu_read(c, addr);
+	uint8_t r = c->A - v;
 	set_flag(c, FLAG_C, c->A >= v);
 	set_flag(c, FLAG_Z, c->A == v);
-	set_flag(c, FLAG_N, c->A & 0x80);
+	set_flag(c, FLAG_N, r & 0x80);
 	return 4 + page_crossed;
 }
 int handle_CMP_INDX(CPU *c)
@@ -1198,9 +1204,10 @@ int handle_CMP_INDX(CPU *c)
 	addr |= cpu_read(c, (pointer_addr + 1) & 0xFF) << 8;
 
 	uint8_t v = cpu_read(c, addr);
+	uint8_t r = c->A - v;
 	set_flag(c, FLAG_C, c->A >= v);
 	set_flag(c, FLAG_Z, c->A == v);
-	set_flag(c, FLAG_N, c->A & 0x80);
+	set_flag(c, FLAG_N, r & 0x80);
 	return 6;
 }
 int handle_CMP_INDY(CPU *c)
@@ -1214,61 +1221,68 @@ int handle_CMP_INDY(CPU *c)
 	int page_crossed = (base_addr & 0xFF00) != (addr & 0xFF00);
 
 	uint8_t v = cpu_read(c, addr);
+	uint8_t r = c->A - v;
 	set_flag(c, FLAG_C, c->A >= v);
 	set_flag(c, FLAG_Z, c->A == v);
-	set_flag(c, FLAG_N, c->A & 0x80);
+	set_flag(c, FLAG_N, r & 0x80);
 	return 5 + page_crossed;
 }
 int handle_CPX_IMM(CPU *c)
 {
 	uint8_t v = fetch_byte(c);
+	uint8_t r = c->X - v;
 	set_flag(c, FLAG_C, c->X >= v);
 	set_flag(c, FLAG_Z, c->X == v);
-	set_flag(c, FLAG_N, c->X & 0x80);
+	set_flag(c, FLAG_N, r & 0x80);
 	return 2;
 }
 int handle_CPX_ZP(CPU *c)
 {
 	uint8_t addr = fetch_byte(c);
 	uint8_t v = cpu_read(c, addr);
+	uint8_t r = c->X - v;
 	set_flag(c, FLAG_C, c->X >= v);
 	set_flag(c, FLAG_Z, c->X == v);
-	set_flag(c, FLAG_N, c->X & 0x80);
+	set_flag(c, FLAG_N, r & 0x80);
 	return 3;
 }
 int handle_CPX_ABS(CPU *c)
 {
 	uint16_t addr = fetch_word(c);
 	uint8_t v = cpu_read(c, addr);
+	uint8_t r = c->X - v;
 	set_flag(c, FLAG_C, c->X >= v);
 	set_flag(c, FLAG_Z, c->X == v);
-	set_flag(c, FLAG_N, c->X & 0x80);
+	set_flag(c, FLAG_N, r & 0x80);
 	return 4;
 }
 int handle_CPY_IMM(CPU *c)
 {
 	uint8_t v = fetch_byte(c);
+	uint8_t r = c->Y - v;
 	set_flag(c, FLAG_C, c->Y >= v);
 	set_flag(c, FLAG_Z, c->Y == v);
-	set_flag(c, FLAG_N, c->Y & 0x80);
+	set_flag(c, FLAG_N, r & 0x80);
 	return 2;
 }
 int handle_CPY_ZP(CPU *c)
 {
 	uint8_t addr = fetch_byte(c);
 	uint8_t v = cpu_read(c, addr);
+	uint8_t r = c->Y - v;
 	set_flag(c, FLAG_C, c->Y >= v);
 	set_flag(c, FLAG_Z, c->Y == v);
-	set_flag(c, FLAG_N, c->Y & 0x80);
+	set_flag(c, FLAG_N, r & 0x80);
 	return 3;
 }
 int handle_CPY_ABS(CPU *c)
 {
 	uint16_t addr = fetch_word(c);
 	uint8_t v = cpu_read(c, addr);
+	uint8_t r = c->Y - v;
 	set_flag(c, FLAG_C, c->Y >= v);
 	set_flag(c, FLAG_Z, c->Y == v);
-	set_flag(c, FLAG_N, c->Y & 0x80);
+	set_flag(c, FLAG_N, r & 0x80);
 	return 4;
 }
 int handle_INC_ZP(CPU *c)
@@ -1478,7 +1492,7 @@ int handle_LSR_ZPX(CPU *c)
 	cpu_write(c, addr, v);
 	v >>= 1;
 	cpu_write(c, addr, v);
-	set_flag(c, FLAG_C, old_v & 0x80);
+	set_flag(c, FLAG_C, old_v & 0x01);
 	SET_FLAGS(c, v);
 	return 6;
 }
@@ -1593,7 +1607,7 @@ int handle_ROR_ACC(CPU *c)
 
 	c->A = (old_A >> 1) | (carry_in ? 0x80 : 0);
 
-	set_flag(c, FLAG_C, old_A & 0x80);
+	set_flag(c, FLAG_C, old_A & 0x01);
 	SET_FLAGS(c, c->A);
 	return 2;
 }
